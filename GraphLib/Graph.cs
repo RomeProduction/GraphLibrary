@@ -28,7 +28,7 @@ namespace GraphLibrary
 		/// <summary>
 		/// Количество ребер
 		/// </summary>
-		public int RibsCount { get { return _ribsCount } }
+		public int RibsCount { get { return _ribsCount; } }
 		/// <summary>
 		/// Списки смежности по вершине
 		/// </summary>
