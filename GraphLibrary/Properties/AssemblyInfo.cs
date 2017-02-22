@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // набором атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные с этой сборкой.
 [assembly: AssemblyTitle("GraphLibrary")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Библиотека для реализации возможностей графов")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("NPI")]
 [assembly: AssemblyProduct("GraphLibrary")]
-[assembly: AssemblyCopyright("©  2017")]
+[assembly: AssemblyCopyright("RomeStudio ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("ru")]
