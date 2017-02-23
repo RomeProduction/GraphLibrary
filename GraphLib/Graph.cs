@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Data;
 
-namespace GraphLibrary {
+namespace GraphLibrary
+{
 	/// <summary>
 	/// Класс реализации графа
 	/// </summary>
 	/// <typeparam name="T">простой тип вроде (int,string)</typeparam>
-	public class Grapf<T> where T : struct {
+    public class Grapf<T> where T: struct
+    {
 		#region Переменные и константы
 		/// <summary>
 		/// Количество вершин
@@ -47,11 +48,11 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Список вершин
 		/// </summary>
-		private List<Peak<T>> _peaks = new List<Peak<T>>();
+		private List<T> _peaks = new List<T>();
 		/// <summary>
 		/// Список вершин
 		/// </summary>
-		public List<Peak<T>> PeaksList {
+		public List<T> PeaksList {
 			get { return _peaks; }
 		}
 
@@ -67,15 +68,6 @@ namespace GraphLibrary {
 			_peakCount = countPeak;
 			_ribsCount = ribsArray.Length;
 			_ribs = ribsArray.ToList();
-			foreach(var rib in Ribs) {
-				if(!PeaksList.Any(x => x == rib.Peak1)) {
-					_peaks.Add(rib.Peak1);
-				}
-				if(!PeaksList.Any(x => x == rib.Peak2)) {
-					_peaks.Add(rib.Peak2);
-				}
-			}
-			_peaks = _peaks.OrderBy(x => x.Value).ToList();
 		}
 		/// <summary>
 		/// Пустой конструктор
@@ -100,23 +92,21 @@ namespace GraphLibrary {
 			}
 			_ribsCount = lines.Length - 2;
 
-			_ribs = new List<Rib<T>>();
-			for(int i = 1; i < lines.Length; i++) {
+			List<Rib<T>> _ribs = new List<Rib<T>>();
+			for(int i=1; i< lines.Length; i++) {
 				var peaks = lines[i].Split(' ');
 				if(peaks.Length < 2 || peaks.Length > 2) {
 					new ArgumentException("Строки с ребрами должны содержать две вершины, разделенные пробелом");
 				}
 				_ribs.Add(new Rib<T>(peaks[0], peaks[1]));
 				//Попутно с перебором ребер создаем список вершин
-				if(!PeaksList.Any(x => x == _ribs.Last().Peak1)) {
-					_peaks.Add(_ribs.Last().Peak1);
+				if(!PeaksList.Contains((T)Convert.ChangeType(peaks[0], typeof(T)))) {
+					_peaks.Add((T)Convert.ChangeType(peaks[0], typeof(T)));
 				}
-				if(!PeaksList.Any(x => x == _ribs.Last().Peak2)) {
-					_peaks.Add(_ribs.Last().Peak2);
+				if(!PeaksList.Contains((T)Convert.ChangeType(peaks[1], typeof(T)))) {
+					_peaks.Add((T)Convert.ChangeType(peaks[1], typeof(T)));
 				}
 			}
-
-			_peaks = _peaks.OrderBy(x => x.Value).ToList();
 		}
 
 		#endregion
@@ -127,7 +117,7 @@ namespace GraphLibrary {
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerable<T> GetAllPeakLoop() {
-			return Ribs.Where(x => x.IsLoop()).Select(x => x.Peak1.Value).Distinct();
+			return Ribs.Where(x => x.IsLoop()).Select(x => x.Peak1).Distinct();
 		}
 		/// <summary>
 		/// Получаем все вершины у которых есть петли с кратностью
@@ -137,8 +127,8 @@ namespace GraphLibrary {
 			Dictionary<T, int> result = new Dictionary<T, int>();
 			var list = GetAllPeakLoop();
 			foreach(var peak in list) {
-				result.Add(peak, Ribs.Count(x => x.IsLoop()
-					&& x.Peak1 == peak));
+				result.Add(peak, Ribs.Count(x => x.IsLoop() 
+					&& EqualityComparer<T>.Default.Equals(x.Peak1, peak)));
 			}
 			return result;
 		}
@@ -153,90 +143,7 @@ namespace GraphLibrary {
 			}
 			return result;
 		}
-		/// <summary>
-		/// Получить компоненты связности
-		/// </summary>
-		/// <returns></returns>
-		public List<List<T>> GetConnectedComponents() {
-			List<List<T>> result = new List<List<T>>();
-			foreach(var peak in PeaksList) {
-				if(!result.Any(x => x.Contains(peak.Value))) {
-					result.Add(GetConnectedComponent(peak.Value));
-				}
-			}
 
-			return result;
-		}
-		/// <summary>
-		/// Получить компонент связности по вершине
-		/// </summary>
-		/// <param name="peak">Вершина</param>
-		/// <returns></returns>
-		public List<T> GetConnectedComponent(T peak) {
-			return RecursiveDetour(peak, true);
-		}
-		/// <summary>
-		/// Создать остовное дерево через рекурсивный алгоритм
-		/// </summary>
-		/// <param name="peak">Вершина с которой начать обход</param>
-		/// <returns></returns>
-		public List<T> GetSpanningTreeRecursive(T peak) {
-			return RecursiveDetour(peak, false);
-		}
-		/// <summary>
-		/// Получить остовное дерево через итеративный алгоритм
-		/// </summary>
-		/// <param name="peak">Вершина с которой начать обход</param>
-		/// <returns></returns>
-		public List<T> GetSpanningTreeIterator(T peak) {
-			return IteratorDetour(peak, false);
-		}
-		/// <summary>
-		/// Рекурсивный обход графа
-		/// </summary>
-		/// <param name="peak"></param>
-		/// <param name="isOrder"></param>
-		/// <param name="result"></param>
-		/// <returns></returns>
-		private List<T> RecursiveDetour(T peak, bool isOrder, List<T> result = null) {
-			if(result == null) {
-				result = new List<T>() { peak };
-			}
-			foreach(var rib in Ribs) {
-				var peakNeigh = rib.GetNeighboringPeak(peak);
-				if(peakNeigh.HasValue) {
-					if(!result.Contains(peakNeigh.Value)) {
-						result.Add(peakNeigh.Value);
-						result = RecursiveDetour(peakNeigh.Value, isOrder, result);
-					}
-				}
-			}
-
-			return isOrder ? result.OrderBy(x => x).ToList() : result;
-		}
-		/// <summary>
-		/// Итеративный обход графа
-		/// </summary>
-		/// <returns></returns>
-		private List<T> IteratorDetour(T peak, bool isOrder) {
-			List<T> result = new List<T>() { peak };
-			Stack<T> st = new Stack<T>();
-
-			st.Push(peak);
-			while(st.Count != 0) {
-				var p = st.Pop();
-
-				var list = GetListNeighboring(p);
-				foreach(var item in list) {
-					if(!result.Contains(item)) {
-						result.Add(item);
-						st.Push(item);
-					}
-				}
-			}
-
-			return isOrder ? result.OrderBy(x => x).ToList() : result;
-		}
 		/// <summary>
 		/// Получить список кратных ребер со степенью
 		/// </summary>
@@ -245,10 +152,7 @@ namespace GraphLibrary {
 			Dictionary<Rib<T>, int> result = new Dictionary<Rib<T>, int>();
 			var list = GetAllFoldRib();
 			foreach(var item in list) {
-				var count = Ribs.Count(x => x == item);
-				if(count > 1) {
-					result.Add(item, count);
-				}
+				result.Add(item, Ribs.Count(x => x == item));
 			}
 			return result;
 		}
@@ -258,9 +162,9 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public List<T> GetAllPendantPeak() {
 			List<T> result = new List<T>();
-			foreach(var peak in _peaks) {
-				if(GetPeakPow(peak.Value) == 1) {
-					result.Add(peak.Value);
+			foreach (var peak in _peaks) {
+				if(GetPeakPow(peak) == 1) {
+					result.Add(peak);
 				}
 			}
 			return result;
@@ -272,8 +176,8 @@ namespace GraphLibrary {
 		public List<T> GetAllIsolationPeak() {
 			List<T> result = new List<T>();
 			foreach(var peak in _peaks) {
-				if(GetPeakPow(peak.Value) == 0) {
-					result.Add(peak.Value);
+				if(GetPeakPow(peak) == 0) {
+					result.Add(peak);
 				}
 			}
 			return result;
@@ -283,16 +187,13 @@ namespace GraphLibrary {
 		/// </summary>
 		/// <returns></returns>
 		public List<Rib<T>> GetAllPendantRib() {
-			var list = GetAllPendantPeak();
 			List<Rib<T>> result = new List<Rib<T>>();
-			IEnumerable<Rib<T>> ribs = null;
-			foreach (var peak in list) {
-				
-				ribs = Ribs.Where(x => x.GetNeighboringPeak(peak).HasValue);
-				result.AddRange(ribs);
+			foreach(var rib in Ribs) {
+				if(GetRibPow(rib) == 1) {
+					result.Add(rib);
+				}
 			}
-			
-			return result.Distinct().ToList();
+			return result;
 		}
 		/// <summary>
 		/// Получить все вершины со степенями
@@ -301,7 +202,7 @@ namespace GraphLibrary {
 		public Dictionary<T, int> GetAllPeakPow() {
 			Dictionary<T, int> result = new Dictionary<T, int>();
 			foreach(var peak in _peaks) {
-				result.Add(peak.Value, GetPeakPow(peak.Value));
+				result.Add(peak, GetPeakPow(peak));
 			}
 			return result;
 		}
@@ -311,8 +212,8 @@ namespace GraphLibrary {
 		/// <param name="peak">Вершина</param>
 		/// <returns></returns>
 		public int GetPeakPow(T peak) {
-			var list = Ribs.Where(x => x.Peak1 == peak ||
-				x.Peak2 == peak);
+			var list = Ribs.Where(x => EqualityComparer<T>.Default.Equals(x.Peak1, peak) ||
+				EqualityComparer<T>.Default.Equals(x.Peak2, peak));
 			int result = 0;
 			foreach(var rib in list) {
 				if(rib.IsLoop()) {
@@ -341,74 +242,7 @@ namespace GraphLibrary {
 			}
 			return result;
 		}
-		/// <summary>
-		/// Получить список смежности
-		/// </summary>
-		/// <returns></returns>
-		public Dictionary<T, IEnumerable<T>> GetListNeighboring() {
-			Dictionary<T, IEnumerable<T>> result = new Dictionary<T, IEnumerable<T>>();
-			foreach(var peak in PeaksList) {
-				result.Add(peak.Value,
-					GetListNeighboring(peak));
-			}
-			return result;
-		}
-		/// <summary>
-		/// Получить список смежности
-		/// </summary>
-		/// <param name="peak">название искомой вершины</param>
-		/// <returns></returns>
-		public List<T> GetListNeighboring(T peak) {
-			return Ribs.Where(x => x.GetNeighboringPeak(peak).HasValue)
-				.Select(x => x.GetNeighboringPeak(peak).Value).ToList();
-		}
-		/// <summary>
-		/// Получить список смежности
-		/// </summary>
-		/// <param name="peak">Искомая вершина</param>
-		/// <returns></returns>
-		public List<T> GetListNeighboring(Peak<T> peak) {
-			return GetListNeighboring(peak.Value);
-		}
-		/// <summary>
-		/// Возвращает матрицу смежности в таблице
-		/// строки и столбцы с названиями вершин
-		/// </summary>
-		/// <returns></returns>
-		public DataTable GetMatrixNeighboring() {
-			DataTable dt = new DataTable("Матрица смежности");
-			foreach(var peak in PeaksList) {
-				dt.Columns.Add(new DataColumn(peak.Value + "", typeof(int)));
-				dt.Columns[peak.Value + ""].DefaultValue = 0;
-			}
-			var dicNeigh = GetListNeighboring();
-			foreach(var neigh in dicNeigh.Keys) {
-				var row = dt.Rows.Add();
-				var list = dicNeigh[neigh];
-				foreach(var value in list) {
-					if(dt.Columns.Contains(value + "")) {
-						row[value + ""] = (int)row[value + ""] + 1;
-					}
-				}
-			}
 
-			return dt;
-		}
-		/// <summary>
-		/// Преобразует данный граф в простой
-		/// </summary>
-		/// <returns></returns>
-		public Grapf<T> GetSimpleGraph() {
-			//Добавляем ребра кроме петель
-			var ribs = Ribs.Where(x => !x.IsLoop()).ToList();
-			//теперь отберем по одному кратному ребру
-			foreach(var rib in Ribs) {
-				if(ribs.Count(x => x == rib) > 1) {
-					ribs.Remove(rib);
-				}
-			}
-			return new Grapf<T>(PeakCount, ribs.ToArray());
-		}
 		#endregion
 	}
 }
