@@ -13,11 +13,11 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Вершина
 		/// </summary>
-		public T Peak1 { get; set; }
+		public Peak<T> Peak1 { get; set; }
 		/// <summary>
 		/// Вершина
 		/// </summary>
-		public T Peak2 { get; set; }
+		public Peak<T> Peak2 { get; set; }
 
 		#region Конструкторы
 		/// <summary>
@@ -26,8 +26,8 @@ namespace GraphLibrary {
 		/// <param name="peak1"></param>
 		/// <param name="peak2"></param>
 		public Rib(T peak1, T peak2) {
-			Peak1 = peak1;
-			Peak2 = peak2;
+			Peak1 = new Peak<T>(peak1);
+			Peak2 = new Peak<T>(peak2);
 		}
 		/// <summary>
 		/// Конструктор
@@ -35,8 +35,8 @@ namespace GraphLibrary {
 		/// <param name="peak1"></param>
 		/// <param name="peak2"></param>
 		public Rib(string peak1, string peak2) {
-			Peak1 = (T)Convert.ChangeType(peak1, typeof(T));
-			Peak2 = (T)Convert.ChangeType(peak2, typeof(T));
+			Peak1 = new Peak<T>((T)Convert.ChangeType(peak1, typeof(T)));
+			Peak2 = new Peak<T>((T)Convert.ChangeType(peak2, typeof(T)));
 		}
 		/// <summary>
 		/// Пустой конструктор
@@ -51,10 +51,22 @@ namespace GraphLibrary {
 		/// </summary>
 		/// <returns></returns>
 		public bool IsLoop() {
-			return EqualityComparer<T>.Default.Equals(Peak1, Peak2);
+			return Peak1 == Peak2;
 		}
-
-
+		/// <summary>
+		/// Возвращает смежную вершину из ребра или null 
+		/// если переданная вершина не соответствует ни одной из концевых вершин
+		/// </summary>
+		/// <param name="peak">Вершина для которой ищется смежная</param>
+		/// <returns></returns>
+		public T? GetNeighboringPeak(T peak) {
+			if(peak == Peak1) {
+				return Peak2.Value;
+			} else if(peak == Peak2) {
+				return Peak1.Value;
+			}
+			return null;
+		}
 		#endregion
 
 		#region Operators
@@ -65,14 +77,14 @@ namespace GraphLibrary {
 		/// <param name="rib2"></param>
 		/// <returns></returns>
 		public static bool operator ==(Rib<T> rib1, Rib<T> rib2) {
-			if(rib1 == null || rib2 == null)
+			if(rib1 + "" == "" || rib2 + "" == "")
 				return false;
-			if((EqualityComparer<T>.Default.Equals(rib1.Peak1, rib2.Peak1) 
-				&& EqualityComparer<T>.Default.Equals(rib1.Peak2, rib2.Peak2)) ||
-				(EqualityComparer<T>.Default.Equals(rib1.Peak1, rib2.Peak2)
-				&& EqualityComparer<T>.Default.Equals(rib1.Peak2, rib2.Peak1)) ||
-				(EqualityComparer<T>.Default.Equals(rib1.Peak2, rib2.Peak1)
-				&& EqualityComparer<T>.Default.Equals(rib1.Peak1, rib2.Peak2))) {
+			if((rib1.Peak1 == rib2.Peak1
+				&& rib1.Peak2 == rib2.Peak2) ||
+				(rib1.Peak1 == rib2.Peak2
+				&& rib1.Peak2 == rib2.Peak1) ||
+				(rib1.Peak2 == rib2.Peak1
+				&& rib1.Peak1 == rib2.Peak2)) {
 				return true;
 			}
 			return false;
@@ -87,6 +99,6 @@ namespace GraphLibrary {
 			return !(rib1 == rib2);
 		}
 
-			#endregion
-		}
+		#endregion
+	}
 }

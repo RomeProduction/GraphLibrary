@@ -1,0 +1,18 @@
+﻿<Window x:Class="WpfGraph.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfGraph"
+        mc:Ignorable="d"
+        Title="Граф" Height="381.41" Width="848.077">
+    <Grid Margin="0,0,-8,-2">
+        <Button x:Name="BtChooseFile" Content="Выбрать файл" HorizontalAlignment="Left" Margin="260,60,0,0" VerticalAlignment="Top" Width="108" Click="BtChooseFile_Click"/>
+        <TextBox x:Name="TxtFile" IsReadOnly="True" HorizontalAlignment="Left" Height="95" Margin="10,60,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="230"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" CanContentScroll="True" VerticalScrollBarVisibility="Auto" Margin="405,60,27,10">
+            <TextBox x:Name="TxtResult" AllowDrop="False" IsReadOnly="True" TextAlignment="Justify" HorizontalAlignment="Left" ScrollViewer.VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="388" MaxHeight="272"/>
+        </ScrollViewer>
+        <Label x:Name="label" Content="Результат:" HorizontalAlignment="Left" Margin="405,17,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
