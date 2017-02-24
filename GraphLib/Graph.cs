@@ -54,7 +54,14 @@ namespace GraphLibrary {
 		public List<Peak<T>> PeaksList {
 			get { return _peaks; }
 		}
-
+		/// <summary>
+		/// Флаг означающий, что имена вершин упорядочены в порядке от 1 до n
+		/// </summary>
+		public bool IsOrderedPeak { get { return _isOrderedPeak; } set { _isOrderedPeak = value; } }
+		/// <summary>
+		/// Флаг упорядоченности вершин
+		/// </summary>
+		private bool _isOrderedPeak = false;
 		#endregion
 
 		#region Конструкторы
@@ -63,9 +70,10 @@ namespace GraphLibrary {
 		/// </summary>
 		/// <param name="countPeak">Количество вершин</param>
 		/// <param name="ribsArray">Массив ребер</param>
-		public Grapf(int countPeak, params Rib<T>[] ribsArray) {
+		public Grapf(int countPeak, bool isOrderedPeak, params Rib<T>[] ribsArray) {
 			_peakCount = countPeak;
 			_ribsCount = ribsArray.Length;
+			_isOrderedPeak = isOrderedPeak;
 			_ribs = ribsArray.ToList();
 			foreach(var rib in Ribs) {
 				if(!PeaksList.Any(x => x == rib.Peak1)) {
@@ -76,21 +84,27 @@ namespace GraphLibrary {
 				}
 			}
 			_peaks = _peaks.OrderBy(x => x.Value).ToList();
+
+			CheckPeaks(isOrderedPeak);
+
 		}
 		/// <summary>
 		/// Пустой конструктор
 		/// </summary>
 		public Grapf() {
+
 		}
 		/// <summary>
 		/// Конструктор с путем к файлу
 		/// </summary>
 		/// <param name="filePath">Путь к файлу</param>
+		/// <param name="isOrderedPeak">если наименования вершин упорядочены, то вместо ошибки будут добавлены автоматически</param>
 		/// <remarks>Файл должен иметь формат первая строка количество вершин, далее все строки ребра</remarks>
-		public Grapf(string filePath) {
+		public Grapf(string filePath, bool isOrderedPeak) {
 			if(!File.Exists(filePath)) {
 				new System.IO.FileNotFoundException("По заданному пути файл не найден");
 			}
+			_isOrderedPeak = isOrderedPeak;
 			var lines = File.ReadAllLines(filePath);
 			if(lines.Length == 0) {
 				new ArgumentException("Файл пустой");
@@ -116,7 +130,33 @@ namespace GraphLibrary {
 				}
 			}
 
+			CheckPeaks(isOrderedPeak);
+
 			_peaks = _peaks.OrderBy(x => x.Value).ToList();
+		}
+
+		/// <summary>
+		/// Проверяет на правильность введенных вершин
+		/// </summary>
+		/// <param name="isOrderedPeaks"></param>
+		private void CheckPeaks(bool isOrderedPeaks) {
+			if(isOrderedPeaks) {
+				for(int i=1; i<PeakCount + 1; i++) {
+					var peak = new Peak<T>(i + "");
+					if(!PeaksList.Any(x => x == (T)Convert.ChangeType(i, typeof(T)))){
+						PeaksList.Insert(i - 1, new Peak<T>(i + ""));
+					}
+				}
+				return;
+			}
+
+			if(_peaks.Count > _peakCount) {
+				throw new Exception("Получено большее количество вершин из ребер, чем передано.");
+			} else if(_peaks.Count < _peakCount) {
+				throw new Exception("Вершин из ребер получено меньше, чем передано.");
+			}
+
+
 		}
 
 		#endregion
@@ -407,7 +447,7 @@ namespace GraphLibrary {
 					ribs.Remove(rib);
 				}
 			}
-			return new Grapf<T>(PeakCount, ribs.ToArray());
+			return new Grapf<T>(PeakCount, IsOrderedPeak, ribs.ToArray());
 		}
 		#endregion
 	}
