@@ -23,20 +23,20 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Конструктор
 		/// </summary>
-		/// <param name="peak1"></param>
-		/// <param name="peak2"></param>
+		/// <param name="peak1">1 смежная вершина, считается начальной</param>
+		/// <param name="peak2">2 смежная верщина, считается конечной</param>
 		public Rib(T peak1, T peak2) {
-			Peak1 = new Peak<T>(peak1);
-			Peak2 = new Peak<T>(peak2);
+			Peak1 = new Peak<T>(peak1, true);
+			Peak2 = new Peak<T>(peak2, false);
 		}
 		/// <summary>
 		/// Конструктор
 		/// </summary>
-		/// <param name="peak1"></param>
-		/// <param name="peak2"></param>
+		/// <param name="peak1">1 смежная вершина, считается начальной</param>
+		/// <param name="peak2">2 смежная верщина, считается конечной</param>
 		public Rib(string peak1, string peak2) {
-			Peak1 = new Peak<T>((T)Convert.ChangeType(peak1, typeof(T)));
-			Peak2 = new Peak<T>((T)Convert.ChangeType(peak2, typeof(T)));
+			Peak1 = new Peak<T>((T)Convert.ChangeType(peak1, typeof(T)), true);
+			Peak2 = new Peak<T>((T)Convert.ChangeType(peak2, typeof(T)), false);
 		}
 		/// <summary>
 		/// Пустой конструктор
@@ -60,9 +60,19 @@ namespace GraphLibrary {
 		/// <param name="peak">Вершина для которой ищется смежная</param>
 		/// <returns></returns>
 		public T? GetNeighboringPeak(T peak) {
+			return GetNeighboringPeak(peak, false);
+		}
+		/// <summary>
+		/// Возвращает смежную вершину из ребра или null 
+		/// если переданная вершина не соответствует ни одной из концевых вершин
+		/// </summary>
+		/// <param name="peak">Вершина для которой ищется смежная</param>
+		/// <param name="isOrGraph">Обозначает, что нужно учитывать направленность для ориентированных графов</param>
+		/// <returns></returns>
+		public T? GetNeighboringPeak(T peak, bool isOrGraph) {
 			if(peak == Peak1) {
 				return Peak2.Value;
-			} else if(peak == Peak2) {
+			} else if(peak == Peak2 && !isOrGraph) {
 				return Peak1.Value;
 			}
 			return null;

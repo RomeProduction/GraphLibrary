@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("GraphLib")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("GraphLibrary")]
+[assembly: AssemblyDescription("Библиотека для работы с графами, создана в учебных целях")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("GraphLib")]
+[assembly: AssemblyCompany("RomeStudio")]
+[assembly: AssemblyProduct("NPI GraphLibrary")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

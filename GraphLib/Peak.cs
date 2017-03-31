@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,16 @@ namespace GraphLibrary {
 		/// Помечена ли вершина
 		/// </summary>
 		public bool IsMark { get; set; }
+		/// <summary>
+		/// Полустепень исхода
+		/// </summary>
+		[DefaultValue(0)]
+		public int SemiDegreeExodus { get; set; }
+		/// <summary>
+		/// Полустепень захода
+		/// </summary>
+		[DefaultValue(0)]
+		public int SemiDegreeSunset { get; set; }
 
 		#region Конструктор
 		/// <summary>
@@ -29,30 +40,69 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Конструктор
 		/// </summary>
-		/// <param name="value"></param>
-		public Peak(T value) {
+		/// <param name="value">Значение вершины</param>
+		/// <param name="isOutgoing">Исходящая ли вершина(для ориентированных графов)</param>
+		public Peak(T value, bool? isOutgoing = null) {
 			IsMark = false;
 			Value = value;
+			if(isOutgoing!= null && isOutgoing.HasValue) {
+				if(isOutgoing.Value) {
+					SemiDegreeExodus++;
+				} else {
+					SemiDegreeSunset++;
+				}
+			}
 		}
 		/// <summary>
 		/// Конструктор
 		/// </summary>
 		/// <param name="value"></param>
-		public Peak(string value) {
+		public Peak(string value, bool? isOutgoing = null) {
 			IsMark = false;
 			Value =(T)Convert.ChangeType(value, typeof(T));
-		}
-		/// <summary>
-		/// Конструктор
-		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="isMark"></param>
-		public Peak(T value, bool isMark) {
-			IsMark = isMark;
-			Value = value;
+			if(isOutgoing != null && isOutgoing.HasValue) {
+				if(isOutgoing.Value) {
+					SemiDegreeExodus++;
+				} else {
+					SemiDegreeSunset++;
+				}
+			}
 		}
 		#endregion
-
+		/// <summary>
+		/// Добавить полустепень захода
+		/// </summary>
+		public void AddSemiDegreeSunset() {
+			SemiDegreeSunset++;
+		}
+		/// <summary>
+		/// Добавить полустепень исхода
+		/// </summary>
+		public void AddSemiDegreeExodus() {
+			SemiDegreeExodus++;
+		}
+		/// <summary>
+		/// Вершина является источником
+		/// </summary>
+		/// <returns></returns>
+		public bool IsSource() {
+			return SemiDegreeSunset == 0;
+		}
+		/// <summary>
+		/// Вершина является стоком
+		/// </summary>
+		/// <returns></returns>
+		public bool IsSink() {
+			return SemiDegreeExodus == 0;
+		}
+		/// <summary>
+		/// Получить степень
+		/// </summary>
+		public int Getpow {
+			get {
+				return SemiDegreeExodus + SemiDegreeSunset;
+			}
+		}
 
 		#region operator
 		/// <summary>
@@ -62,6 +112,9 @@ namespace GraphLibrary {
 		/// <param name="peak2"></param>
 		/// <returns></returns>
 		public static bool operator == (Peak<T> peak1, Peak<T> peak2) {
+			if(peak1 + "" == "" || peak2 + "" == "") {
+				return false;
+			}
 			return EqualityComparer<T>.Default.Equals(peak1.Value, peak2.Value);
 		}
 		/// <summary>
