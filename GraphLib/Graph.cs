@@ -19,7 +19,11 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Количество вершин
 		/// </summary>
-		public int PeakCount { get { return _peakCount; } }
+		public int PeakCount {
+			get {
+				return _peakCount;
+			}
+		}
 		/// <summary>
 		/// Количество ребер
 		/// </summary>
@@ -27,7 +31,11 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Количество ребер
 		/// </summary>
-		public int RibsCount { get { return _ribsCount; } }
+		public int RibsCount {
+			get {
+				return _ribsCount;
+			}
+		}
 		/// <summary>
 		/// Списки смежности по вершине
 		/// </summary>
@@ -35,7 +43,11 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Списки смежности с ключом по номеру вершины
 		/// </summary>
-		public Dictionary<T, List<T>> AdjLists { get { return _adjLists; } }
+		public Dictionary<T, List<T>> AdjLists {
+			get {
+				return _adjLists;
+			}
+		}
 		/// <summary>
 		/// Ребра
 		/// </summary>
@@ -43,7 +55,11 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Список ребер
 		/// </summary>
-		public List<Rib<T>> Ribs { get { return _ribs; } }
+		public List<Rib<T>> Ribs {
+			get {
+				return _ribs;
+			}
+		}
 		/// <summary>
 		/// Список вершин
 		/// </summary>
@@ -52,12 +68,21 @@ namespace GraphLibrary {
 		/// Список вершин
 		/// </summary>
 		public List<Peak<T>> PeaksList {
-			get { return _peaks; }
+			get {
+				return _peaks;
+			}
 		}
 		/// <summary>
 		/// Флаг означающий, что имена вершин упорядочены в порядке от 1 до n
 		/// </summary>
-		public bool IsOrderedPeak { get { return _isOrderedPeak; } set { _isOrderedPeak = value; } }
+		public bool IsOrderedPeak {
+			get {
+				return _isOrderedPeak;
+			}
+			set {
+				_isOrderedPeak = value;
+			}
+		}
 		/// <summary>
 		/// Флаг упорядоченности вершин
 		/// </summary>
@@ -75,11 +100,11 @@ namespace GraphLibrary {
 			_ribsCount = ribsArray.Length;
 			_isOrderedPeak = isOrderedPeak;
 			_ribs = ribsArray.ToList();
-			foreach(var rib in Ribs) {
-				if(!PeaksList.Any(x => x == rib.Peak1)) {
+			foreach (var rib in Ribs) {
+				if (!PeaksList.Any(x => x == rib.Peak1)) {
 					_peaks.Add(rib.Peak1);
 				}
-				if(!PeaksList.Any(x => x == rib.Peak2)) {
+				if (!PeaksList.Any(x => x == rib.Peak2)) {
 					_peaks.Add(rib.Peak2);
 				}
 			}
@@ -101,47 +126,50 @@ namespace GraphLibrary {
 		/// <param name="isOrderedPeak">если наименования вершин упорядочены, то вместо ошибки будут добавлены автоматически</param>
 		/// <remarks>Файл должен иметь формат первая строка количество вершин, далее все строки ребра</remarks>
 		public Grapf(string filePath, bool isOrderedPeak) {
-			if(!File.Exists(filePath)) {
+			if (!File.Exists(filePath)) {
 				new System.IO.FileNotFoundException("По заданному пути файл не найден");
 			}
 			_isOrderedPeak = isOrderedPeak;
 			var lines = File.ReadAllLines(filePath);
-			if(lines.Length == 0) {
+			if (lines.Length == 0) {
 				new ArgumentException("Файл пустой");
 			}
-			if(!int.TryParse(lines[0], out _peakCount)) {
+			if (!int.TryParse(lines[0], out _peakCount)) {
 				new ArgumentException("Первой строкой в файле должно быть количество вершин, целое число.");
 			}
 			_ribsCount = lines.Length - 2;
 
 			_ribs = new List<Rib<T>>();
-			for(int i = 1; i < lines.Length; i++) {
+			for (int i = 1; i < lines.Length; i++) {
 				var peaks = lines[i].Split(' ');
-				if(peaks.Length < 2 || peaks.Length > 2) {
+				if (peaks.Length < 2 || peaks.Length > 2) {
 					new ArgumentException("Строки с ребрами должны содержать две вершины, разделенные пробелом");
 				}
-				_ribs.Add(new Rib<T>(peaks[0], peaks[1]));
+				var peak1 = new Peak<T>(peaks[0], true);
+				var peak2 = new Peak<T>(peaks[1], false);
 
 				//Попутно с перебором ребер создаем список вершин
-				if(PeaksList.Any(x => x == _ribs.Last().Peak1)) {
-					var peak = PeaksList.FirstOrDefault(x => x == _ribs.Last().Peak1);
-					if(peak != null) {
+				if (PeaksList.Any(x => x == peak1)) {
+					var peak = PeaksList.FirstOrDefault(x => x == peak1);
+					if (peak != null) {
 						peak.AddSemiDegreeExodus();
+						peak1 = peak;
 					}
 				}
-				if(PeaksList.Any(x => x == _ribs.Last().Peak2)) {
-					var peak = PeaksList.FirstOrDefault(x => x == _ribs.Last().Peak2);
-					if(peak != null) {
+				if (PeaksList.Any(x => x == peak2)) {
+					var peak = PeaksList.FirstOrDefault(x => x == peak2);
+					if (peak != null) {
 						peak.AddSemiDegreeSunset();
+						peak2 = peak;
 					}
 				}
-				if(!PeaksList.Any(x => x == _ribs.Last().Peak1)) {
-					_peaks.Add(_ribs.Last().Peak1);
+				if (!PeaksList.Any(x => x == peak1)) {
+					_peaks.Add(peak1);
 				}
-				if(!PeaksList.Any(x => x == _ribs.Last().Peak2)) {
-					_peaks.Add(_ribs.Last().Peak2);
+				if (!PeaksList.Any(x => x == peak2)) {
+					_peaks.Add(peak2);
 				}
-
+				_ribs.Add(new Rib<T>(peak1, peak2));
 			}
 
 			CheckPeaks(isOrderedPeak);
@@ -154,19 +182,19 @@ namespace GraphLibrary {
 		/// </summary>
 		/// <param name="isOrderedPeaks"></param>
 		private void CheckPeaks(bool isOrderedPeaks) {
-			if(isOrderedPeaks) {
-				for(int i = 1; i < PeakCount + 1; i++) {
+			if (isOrderedPeaks) {
+				for (int i = 1; i < PeakCount + 1; i++) {
 					var peak = new Peak<T>(i + "");
-					if(!PeaksList.Any(x => x == (T)Convert.ChangeType(i, typeof(T)))) {
+					if (!PeaksList.Any(x => x == (T)Convert.ChangeType(i, typeof(T)))) {
 						PeaksList.Insert(i - 1, new Peak<T>(i + ""));
 					}
 				}
 				return;
 			}
 
-			if(_peaks.Count > _peakCount) {
+			if (_peaks.Count > _peakCount) {
 				throw new Exception("Получено большее количество вершин из ребер, чем передано.");
-			} else if(_peaks.Count < _peakCount) {
+			} else if (_peaks.Count < _peakCount) {
 				throw new Exception("Вершин из ребер получено меньше, чем передано.");
 			}
 
@@ -190,7 +218,7 @@ namespace GraphLibrary {
 		public Dictionary<T, int> GetAllPeakLoopWithPow() {
 			Dictionary<T, int> result = new Dictionary<T, int>();
 			var list = GetAllPeakLoop();
-			foreach(var peak in list) {
+			foreach (var peak in list) {
 				result.Add(peak, Ribs.Count(x => x.IsLoop()
 					&& x.Peak1 == peak));
 			}
@@ -202,7 +230,7 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public IEnumerable<Rib<T>> GetAllFoldRib() {
 			List<Rib<T>> result = new List<Rib<T>>();
-			foreach(var rib in Ribs) {
+			foreach (var rib in Ribs) {
 				result.AddRange(Ribs.Where(x => x == rib && !result.Any(r => r == x)));
 			}
 			return result;
@@ -213,9 +241,9 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public List<List<T>> GetConnectedComponents(bool isOrientGraph) {
 			List<List<T>> result = new List<List<T>>();
-			foreach(var peak in PeaksList) {
-				if(!result.Any(x => x.Contains(peak.Value))) {
-					result.Add(isOrientGraph? GetConnectedComponentNotOrder(peak.Value, isOrientGraph)
+			foreach (var peak in PeaksList) {
+				if (!result.Any(x => x.Contains(peak.Value))) {
+					result.Add(isOrientGraph ? GetConnectedComponentNotOrder(peak.Value, isOrientGraph)
 						: GetConnectedComponent(peak.Value, isOrientGraph));
 				}
 			}
@@ -262,14 +290,14 @@ namespace GraphLibrary {
 		/// <param name="result"></param>
 		/// <returns></returns>
 		private List<T> RecursiveDetour(T peak, bool isOrder, bool isOrientGraph, List<T> result = null) {
-			if(result == null) {
+			if (result == null) {
 				result = new List<T>() { peak };
 			}
-			foreach(var rib in Ribs) {
-				var	peakNeigh = rib.GetNeighboringPeak(peak, isOrientGraph);
-				
-				if(peakNeigh.HasValue) {
-					if(!result.Contains(peakNeigh.Value)) {
+			foreach (var rib in Ribs) {
+				var peakNeigh = rib.GetNeighboringPeak(peak, isOrientGraph);
+
+				if (peakNeigh.HasValue) {
+					if (!result.Contains(peakNeigh.Value)) {
 						result.Add(peakNeigh.Value);
 						result = RecursiveDetour(peakNeigh.Value, isOrder, isOrientGraph, result);
 					}
@@ -286,15 +314,15 @@ namespace GraphLibrary {
 		/// <param name="result"></param>
 		/// <returns></returns>
 		private bool RecursiveAcyclic(T peak, Peak<T> basePeak) {
-			
-			foreach(var rib in Ribs) {
+
+			foreach (var rib in Ribs) {
 				var peakNeigh = rib.GetNeighboringPeak(peak, true);
 
-				if(peakNeigh.HasValue) {
-					if(peakNeigh.Value == basePeak) {
+				if (peakNeigh.HasValue) {
+					if (peakNeigh.Value == basePeak) {
 						return false;
 					} else {
-						if(!RecursiveAcyclic(peakNeigh.Value, basePeak)) {
+						if (!RecursiveAcyclic(peakNeigh.Value, basePeak)) {
 							return false;
 						}
 						return true;
@@ -313,12 +341,12 @@ namespace GraphLibrary {
 			Stack<T> st = new Stack<T>();
 
 			st.Push(peak);
-			while(st.Count != 0) {
+			while (st.Count != 0) {
 				var p = st.Pop();
 
 				var list = GetListNeighboring(p);
-				foreach(var item in list) {
-					if(!result.Contains(item)) {
+				foreach (var item in list) {
+					if (!result.Contains(item)) {
 						result.Add(item);
 						st.Push(item);
 					}
@@ -334,9 +362,9 @@ namespace GraphLibrary {
 		public Dictionary<Rib<T>, int> GetAllFoldRibWithPow() {
 			Dictionary<Rib<T>, int> result = new Dictionary<Rib<T>, int>();
 			var list = GetAllFoldRib();
-			foreach(var item in list) {
+			foreach (var item in list) {
 				var count = Ribs.Count(x => x == item);
-				if(count > 1) {
+				if (count > 1) {
 					result.Add(item, count);
 				}
 			}
@@ -348,8 +376,8 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public List<T> GetAllPendantPeak() {
 			List<T> result = new List<T>();
-			foreach(var peak in _peaks) {
-				if(GetPeakPow(peak.Value) == 1) {
+			foreach (var peak in _peaks) {
+				if (GetPeakPow(peak.Value) == 1) {
 					result.Add(peak.Value);
 				}
 			}
@@ -361,8 +389,8 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public List<T> GetAllIsolationPeak() {
 			List<T> result = new List<T>();
-			foreach(var peak in _peaks) {
-				if(GetPeakPow(peak.Value) == 0) {
+			foreach (var peak in _peaks) {
+				if (GetPeakPow(peak.Value) == 0) {
 					result.Add(peak.Value);
 				}
 			}
@@ -376,7 +404,7 @@ namespace GraphLibrary {
 			var list = GetAllPendantPeak();
 			List<Rib<T>> result = new List<Rib<T>>();
 			IEnumerable<Rib<T>> ribs = null;
-			foreach(var peak in list) {
+			foreach (var peak in list) {
 
 				ribs = Ribs.Where(x => x.GetNeighboringPeak(peak).HasValue);
 				result.AddRange(ribs);
@@ -390,8 +418,8 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public Dictionary<T, int> GetAllPeakPow() {
 			Dictionary<T, int> result = new Dictionary<T, int>();
-			foreach(var peak in _peaks) {
-				result.Add(peak.Value, GetPeakPow(peak.Value));
+			foreach (var peak in _peaks) {
+				result.Add(peak.Value, peak.Pow);
 			}
 			return result;
 		}
@@ -404,8 +432,8 @@ namespace GraphLibrary {
 			var list = Ribs.Where(x => x.Peak1 == peak ||
 				x.Peak2 == peak);
 			int result = 0;
-			foreach(var rib in list) {
-				if(rib.IsLoop()) {
+			foreach (var rib in list) {
+				if (rib.IsLoop()) {
 					result += 2;
 				} else {
 					result++;
@@ -422,8 +450,8 @@ namespace GraphLibrary {
 		public int GetRibPow(Rib<T> rib) {
 			var list = Ribs.Where(x => x == rib);
 			int result = 0;
-			foreach(var r in list) {
-				if(r.IsLoop()) {
+			foreach (var r in list) {
+				if (r.IsLoop()) {
 					result += 2;
 				} else {
 					result++;
@@ -437,7 +465,7 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public Dictionary<T, IEnumerable<T>> GetListNeighboring() {
 			Dictionary<T, IEnumerable<T>> result = new Dictionary<T, IEnumerable<T>>();
-			foreach(var peak in PeaksList) {
+			foreach (var peak in PeaksList) {
 				result.Add(peak.Value,
 					GetListNeighboring(peak));
 			}
@@ -449,7 +477,7 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public Dictionary<T, IEnumerable<T>> GetListNeighboringForOrientGraph() {
 			Dictionary<T, IEnumerable<T>> result = new Dictionary<T, IEnumerable<T>>();
-			foreach(var peak in PeaksList) {
+			foreach (var peak in PeaksList) {
 				result.Add(peak.Value,
 					GetListNeighboringForOrientGraph(peak.Value));
 			}
@@ -488,16 +516,16 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public DataTable GetMatrixNeighboring() {
 			DataTable dt = new DataTable("Матрица смежности");
-			foreach(var peak in PeaksList) {
+			foreach (var peak in PeaksList) {
 				dt.Columns.Add(new DataColumn(peak.Value + "", typeof(int)));
 				dt.Columns[peak.Value + ""].DefaultValue = 0;
 			}
 			var dicNeigh = GetListNeighboring();
-			foreach(var neigh in dicNeigh.Keys) {
+			foreach (var neigh in dicNeigh.Keys) {
 				var row = dt.Rows.Add();
 				var list = dicNeigh[neigh];
-				foreach(var value in list) {
-					if(dt.Columns.Contains(value + "")) {
+				foreach (var value in list) {
+					if (dt.Columns.Contains(value + "")) {
 						row[value + ""] = (int)row[value + ""] + 1;
 					}
 				}
@@ -513,8 +541,8 @@ namespace GraphLibrary {
 			//Добавляем ребра кроме петель
 			var ribs = Ribs.Where(x => !x.IsLoop()).ToList();
 			//теперь отберем по одному кратному ребру
-			foreach(var rib in Ribs) {
-				if(ribs.Count(x => x == rib) > 1) {
+			foreach (var rib in Ribs) {
+				if (ribs.Count(x => x == rib) > 1) {
 					ribs.Remove(rib);
 				}
 			}
@@ -525,26 +553,60 @@ namespace GraphLibrary {
 		/// </summary>
 		/// <returns></returns>
 		public List<Peak<T>> GetSourcePeaks() {
-			return PeaksList.Where(x => x.IsSource()).ToList();
+			return PeaksList.Where(x => x.IsSource).ToList();
 		}
 		/// <summary>
 		/// Получить список вершин стоков
 		/// </summary>
 		/// <returns></returns>
 		public List<Peak<T>> GetSinkPeaks() {
-			return PeaksList.Where(x => x.IsSink()).ToList();
+			return PeaksList.Where(x => x.IsSink).ToList();
 		}
 		/// <summary>
 		/// Является ли граф ацикличным
 		/// </summary>
 		/// <returns></returns>
 		public bool IsAcyclic() {
-			foreach(var peak in PeaksList) {
-				if(!RecursiveAcyclic(peak.Value, peak)) {
+			foreach (var peak in PeaksList) {
+				if (!RecursiveAcyclic(peak.Value, peak)) {
 					return false;
 				}
 			}
 			return true;
+		}
+		/// <summary>
+		/// Топологическая сортировка
+		/// </summary>
+		public List<T> TopologicalSort() {
+			if (!IsAcyclic()) {
+				throw new Exception("Топологическая сортировка возможна только для ацикличных графов.");
+			}
+			List<Peak<T>> result = new List<Peak<T>>();
+
+			return TopSortRecursive(
+				PeaksList.Where(x => x.IsSource).ToList(), 
+				result).Select(x => x.Value).ToList();
+		}
+		/// <summary>
+		/// Рекурсивный обход для топологической сортировки
+		/// </summary>
+		/// <param name="peaks"></param>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		private List<Peak<T>> TopSortRecursive(List<Peak<T>> peaks, List<Peak<T>> result) {
+			List<Peak<T>> temp = new List<Peak<T>>();
+			foreach (var peak in peaks) {
+				if (!result.Any(x => x == peak)) {
+					result.Add(peak);
+					temp.Add(peak);
+				}
+			}
+			if (temp.Any(x => !x.IsSink)) {
+				foreach (var p in temp) {
+					result = TopSortRecursive(p.AvailablePeaks, result);
+				}
+			}
+			return result;
 		}
 		#endregion
 	}

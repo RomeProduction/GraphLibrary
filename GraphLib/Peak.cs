@@ -29,6 +29,14 @@ namespace GraphLibrary {
 		/// </summary>
 		[DefaultValue(0)]
 		public int SemiDegreeSunset { get; set; }
+		/// <summary>
+		/// Список смежных вершин
+		/// </summary>
+		public List<Peak<T>> NeighboursPeaks { get; set; }
+		/// <summary>
+		/// Список достижимых вершин
+		/// </summary>
+		public List<Peak<T>> AvailablePeaks { get; set; }
 
 		#region Конструктор
 		/// <summary>
@@ -36,6 +44,8 @@ namespace GraphLibrary {
 		/// </summary>
 		public Peak() {
 			IsMark = false;
+			NeighboursPeaks = new List<Peak<T>>();
+			AvailablePeaks = new List<Peak<T>>();
 		}
 		/// <summary>
 		/// Конструктор
@@ -52,6 +62,8 @@ namespace GraphLibrary {
 					SemiDegreeSunset++;
 				}
 			}
+			NeighboursPeaks = new List<Peak<T>>();
+			AvailablePeaks = new List<Peak<T>>();
 		}
 		/// <summary>
 		/// Конструктор
@@ -67,8 +79,11 @@ namespace GraphLibrary {
 					SemiDegreeSunset++;
 				}
 			}
+			NeighboursPeaks = new List<Peak<T>>();
+			AvailablePeaks = new List<Peak<T>>();
 		}
 		#endregion
+
 		/// <summary>
 		/// Добавить полустепень захода
 		/// </summary>
@@ -85,20 +100,24 @@ namespace GraphLibrary {
 		/// Вершина является источником
 		/// </summary>
 		/// <returns></returns>
-		public bool IsSource() {
-			return SemiDegreeSunset == 0;
+		public bool IsSource {
+			get {
+				return SemiDegreeSunset == 0;
+			}
 		}
 		/// <summary>
 		/// Вершина является стоком
 		/// </summary>
 		/// <returns></returns>
-		public bool IsSink() {
-			return SemiDegreeExodus == 0;
+		public bool IsSink {
+			get {
+				return SemiDegreeExodus == 0;
+			}
 		}
 		/// <summary>
 		/// Получить степень
 		/// </summary>
-		public int Getpow {
+		public int Pow {
 			get {
 				return SemiDegreeExodus + SemiDegreeSunset;
 			}

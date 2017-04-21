@@ -39,6 +39,27 @@ namespace GraphLibrary {
 			Peak2 = new Peak<T>((T)Convert.ChangeType(peak2, typeof(T)), false);
 		}
 		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="peak1">1 смежная вершина, считается начальной</param>
+		/// <param name="peak2">2 смежная верщина, считается конечной</param>
+		public Rib(Peak<T> peak1, Peak<T> peak2) {
+			if(peak1 == null || peak2 == null) {
+				throw new ArgumentNullException("Вершина", "Одна из вершин при создании ребра равна null.");
+			}
+			Peak1 = peak1;
+			Peak2 = peak2;
+			if(!Peak1.NeighboursPeaks.Any(x => x == Peak2)) {
+				Peak1.NeighboursPeaks.Add(Peak2);
+			}
+			if(!Peak1.AvailablePeaks.Any(x => x == Peak2)) {
+				Peak1.AvailablePeaks.Add(Peak2);
+			}		
+			if(!Peak2.NeighboursPeaks.Any(x => x == Peak1)) {
+				Peak2.NeighboursPeaks.Add(Peak1);
+			}
+		}
+		/// <summary>
 		/// Пустой конструктор
 		/// </summary>
 		public Rib() {
