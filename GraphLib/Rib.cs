@@ -98,6 +98,13 @@ namespace GraphLibrary {
 			}
 			return null;
 		}
+		/// <summary>
+		/// Получить транспанированное ребро
+		/// </summary>
+		/// <returns></returns>
+		public Rib<T> GetTransparentRib() {
+			return new Rib<T>(new Peak<T>(Peak2.Value, true), new Peak<T>(Peak1.Value, false));
+		}
 		#endregion
 
 		#region Operators

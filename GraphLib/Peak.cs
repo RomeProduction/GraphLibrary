@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GraphLib.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace GraphLibrary {
 		/// <summary>
 		/// Помечена ли вершина
 		/// </summary>
-		public bool IsMark { get; set; }
+		internal bool IsMark { get; set; }
 		/// <summary>
 		/// Полустепень исхода
 		/// </summary>
@@ -121,6 +122,32 @@ namespace GraphLibrary {
 			get {
 				return SemiDegreeExodus + SemiDegreeSunset;
 			}
+		}
+		/// <summary>
+		/// Снять метку
+		/// </summary>
+		public void UnMark() {
+			IsMark = false;
+		}
+		/// <summary>
+		/// Добавить достижимую вершину
+		/// </summary>
+		/// <param name="peak">Вершина</param>
+		public void AddAvailablePeak(Peak<T> peak) {
+			if (AvailablePeaks.Any(x => x == peak)) {
+				return;
+			}
+			AvailablePeaks.Add(peak);
+		}
+		/// <summary>
+		/// Добавить смежную вершину
+		/// </summary>
+		/// <param name="peak"></param>
+		public void AddNeighbourPeak(Peak<T> peak) {
+			if (NeighboursPeaks.Any(x => x == peak)) {
+				return;
+			}
+			NeighboursPeaks.Add(peak);
 		}
 
 		#region operator
