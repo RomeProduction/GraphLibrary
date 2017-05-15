@@ -58,9 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\PeakStatusEnum.cs" />
     <Compile Include="Extension\GraphExtension.cs" />
-    <Compile Include="Extension\ListExtension.cs" />
     <Compile Include="Extension\PeakExtension.cs" />
     <Compile Include="Grapf.Orient.cs" />
     <Compile Include="Graph.cs" />
