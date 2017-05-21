@@ -78,11 +78,11 @@ namespace GraphLibrary {
 						var p1 = mGrapf.PeaksList.FirstOrDefault(x => x == iKey);					
 						var p2 = mGrapf.PeaksList.FirstOrDefault(x => x == jKey);
 						
-						var tRib = new Rib<int>(p1, p2);
+						var tRib = new Rib<int>(p1, p2, rib.Weight);
 						if (!mGrapf.Ribs.Any(x => x == tRib)) {
 							p1.AddSemiDegreeExodus();
 							p2.AddSemiDegreeSunset();
-							mGrapf.Ribs.Add(new Rib<int>(p1, p2));
+							mGrapf.Ribs.Add(new Rib<int>(p1, p2, rib.Weight));
 						}
 						
 					}
@@ -91,11 +91,11 @@ namespace GraphLibrary {
 						var p1 = mGrapf.PeaksList.FirstOrDefault(x => x == jKey);
 						var p2 = mGrapf.PeaksList.FirstOrDefault(x => x == iKey);
 						
-						var tRib = new Rib<int>(p1, p2);
+						var tRib = new Rib<int>(p1, p2, rib.Weight);
 						if (!mGrapf.Ribs.Any(x => x == tRib)) {
 							p1.AddSemiDegreeExodus();
 							p2.AddSemiDegreeSunset();
-							mGrapf.Ribs.Add(new Rib<int>(p1, p2));
+							mGrapf.Ribs.Add(new Rib<int>(p1, p2, rib.Weight));
 						}
 					}
 				}

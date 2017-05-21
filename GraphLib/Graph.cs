@@ -144,16 +144,22 @@ namespace GraphLibrary {
 			if (!int.TryParse(lines[0], out _peakCount)) {
 				new ArgumentException("Первой строкой в файле должно быть количество вершин, целое число.");
 			}
+
 			_ribsCount = lines.Length - 2;
 
 			_ribs = new List<Rib<T>>();
 			for (int i = 1; i < lines.Length; i++) {
 				var peaks = lines[i].Split(' ');
-				if (peaks.Length < 2 || peaks.Length > 2) {
-					new ArgumentException("Строки с ребрами должны содержать две вершины, разделенные пробелом");
+				if ((peaks.Length < 2 || peaks.Length > 2) && peaks.Length != 3) {
+					new ArgumentException("Строки с ребрами должны содержать две вершины, разделенные пробелом, через пробел также может быть введен вес ребра");
 				}
 				var peak1 = new Peak<T>(peaks[0], true);
 				var peak2 = new Peak<T>(peaks[1], false);
+				double weight = 0;
+				if (peaks.Length == 3) {
+					peaks[2] = peaks[2].Replace(',', '.');
+					double.TryParse(peaks[2], out weight);
+				}
 
 				//Попутно с перебором ребер создаем список вершин
 				if (PeaksList.Any(x => x == peak1)) {
@@ -176,7 +182,7 @@ namespace GraphLibrary {
 				if (!PeaksList.Any(x => x == peak2)) {
 					_peaks.Add(peak2);
 				}
-				_ribs.Add(new Rib<T>(peak1, peak2));
+				_ribs.Add(new Rib<T>(peak1, peak2, weight));
 			}
 
 			CheckPeaks(isOrderedPeak);
@@ -409,7 +415,7 @@ namespace GraphLibrary {
 			IEnumerable<Rib<T>> ribs = null;
 			foreach (var peak in list) {
 
-				ribs = Ribs.Where(x => x.GetNeighboringPeak(peak).HasValue);
+				ribs = Ribs.Where(x => x.GetNeighboringPeakValue(peak).HasValue);
 				result.AddRange(ribs);
 			}
 
@@ -480,8 +486,8 @@ namespace GraphLibrary {
 		/// <param name="peak">название искомой вершины</param>
 		/// <returns></returns>
 		public List<T> GetListNeighboring(T peak) {
-			return Ribs.Where(x => x.GetNeighboringPeak(peak).HasValue)
-				.Select(x => x.GetNeighboringPeak(peak).Value).ToList();
+			return Ribs.Where(x => x.GetNeighboringPeakValue(peak).HasValue)
+				.Select(x => x.GetNeighboringPeakValue(peak).Value).ToList();
 		}
 
 		/// <summary>

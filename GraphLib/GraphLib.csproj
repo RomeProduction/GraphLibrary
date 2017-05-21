@@ -47,6 +47,38 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab1|AnyCPU'">
+    <OutputPath>bin\Lab1\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab1|x64'">
+    <OutputPath>bin\x64\Lab1\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab2|AnyCPU'">
+    <OutputPath>bin\Lab2\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab2|x64'">
+    <OutputPath>bin\x64\Lab2\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab3|AnyCPU'">
+    <OutputPath>bin\Lab3\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab3|x64'">
+    <OutputPath>bin\x64\Lab3\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab4|AnyCPU'">
+    <OutputPath>bin\Lab4\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab4|x64'">
+    <OutputPath>bin\x64\Lab4\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab5|AnyCPU'">
+    <OutputPath>bin\Lab5\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Lab5|x64'">
+    <OutputPath>bin\x64\Lab5\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -60,8 +92,10 @@
   <ItemGroup>
     <Compile Include="Extension\GraphExtension.cs" />
     <Compile Include="Extension\PeakExtension.cs" />
+    <Compile Include="Extension\RibExtension.cs" />
     <Compile Include="Grapf.Orient.cs" />
     <Compile Include="Graph.cs" />
+    <Compile Include="Models\ConnectedComponent.cs" />
     <Compile Include="Peak.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rib.cs" />
