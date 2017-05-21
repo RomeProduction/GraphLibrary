@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GraphLib.Models {
+namespace GraphLibrary.Models {
 	/// <summary>
 	/// Компонента связности
 	/// </summary>

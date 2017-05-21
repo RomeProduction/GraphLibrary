@@ -1,5 +1,5 @@
 ﻿using GraphLib.Models;
-using GraphLibrary;
+using GraphLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -247,6 +247,134 @@ namespace GraphLibrary {
 
 			return components[0].Ribs;
 
+		}
+
+		/// <summary>
+		/// Получить кратчайший путь по алгоритму Форда
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="grapf"></param>
+		/// <returns></returns>
+		public static Dictionary<T, List<Peak<T>>> GetShortPath<T>(this Grapf<T> grapf, Peak<T> beginnerPeak, IBag<T> path) where T : struct {
+
+			Dictionary<T, List<Peak<T>>> res = new Dictionary<T, List<Peak<T>>>();
+			
+			grapf.PeaksList.ForEach(x => {
+				if (x != beginnerPeak) {
+					x.Dist = double.MaxValue;
+				} else {
+					x.Dist = 0;
+				}
+			});
+
+			var root = grapf.PeaksList.FirstOrDefault(x => x.Value == beginnerPeak);
+			path.PushVal(root.Value);
+
+			while (path.CountElems() > 0) {
+
+				var u = path.PopVal();
+				var peakU = grapf.PeaksList.FirstOrDefault(x => x == u);
+				foreach (var peakV in peakU.AvailablePeaks) {
+
+					var rib = grapf.Ribs.FirstOrDefault(x => x.Peak1 == peakU && x.Peak2 == peakV);
+					if (peakU.Dist + rib.Weight < peakV.Dist) {
+						peakV.Dist = peakU.Dist + rib.Weight;
+						peakV.Pred = peakU;
+
+						path.PushVal(peakV.Value);
+					}
+				}
+
+			}
+
+			foreach (var peak in grapf.PeaksList) {
+				var pred = peak;
+				var list = new List<Peak<T>>();
+				res.Add(peak.Value, new List<Peak<T>>());
+				while (pred != null) {
+					list.Add(pred);
+					pred = pred.Pred;
+				}
+
+				if (list.Any(x => x == beginnerPeak)) {
+					res[peak.Value] = list;
+				} else {
+					res.Remove(peak.Value);
+				}
+			}
+
+			foreach (var peak in grapf.PeaksList) {
+				peak.Dist = double.MaxValue;
+				peak.Pred = null;
+			}
+
+			return res;
+		}
+
+		/// <summary>
+		/// Получить кратчайший путь по алгоритму Форда
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="grapf"></param>
+		/// <returns></returns>
+		public static Dictionary<TValue, List<Peak<TValue>>> GetShortPath<TValue>(
+			this Grapf<TValue> grapf, 
+			Peak<TValue> beginnerPeak, 
+			IBag<double, TValue> path) 
+			where TValue : struct {
+
+			Dictionary<TValue, List<Peak<TValue>>> res = new Dictionary<TValue, List<Peak<TValue>>>();
+
+			grapf.PeaksList.ForEach(x => {
+				if (x != beginnerPeak) {
+					x.Dist = double.MaxValue;
+				} else {
+					x.Dist = 0;
+				}
+			});
+
+			var root = grapf.PeaksList.FirstOrDefault(x => x.Value == beginnerPeak);
+			path.PushVal(root.Value);
+
+			while (path.CountElems() > 0) {
+
+				var u = path.PopVal();
+				var peakU = grapf.PeaksList.FirstOrDefault(x => x == u);
+				foreach (var peakV in peakU.AvailablePeaks) {
+
+					var rib = grapf.Ribs.FirstOrDefault(x => x.Peak1 == peakU && x.Peak2 == peakV);
+					if (peakU.Dist + rib.Weight < peakV.Dist) {
+						peakV.Dist = peakU.Dist + rib.Weight;
+						peakV.Pred = peakU;
+
+						path.PushVal(peakV.Dist, peakV.Value);
+					}
+				}
+
+			}
+
+			foreach (var peak in grapf.PeaksList) {
+				var pred = peak;
+				var list = new List<Peak<TValue>>();
+				res.Add(peak.Value, new List<Peak<TValue>>());
+				while (pred != null) {
+					list.Add(pred);
+					pred = pred.Pred;
+				}
+
+				if (list.Any(x => x == beginnerPeak)) {
+					res[peak.Value] = list;
+				} else {
+					res.Remove(peak.Value);
+				}
+			}
+
+			foreach (var peak in grapf.PeaksList) {
+				peak.Dist = double.MaxValue;
+				peak.Pred = null;
+			}
+
+			return res;
 		}
 	}
 }

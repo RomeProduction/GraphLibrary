@@ -39,6 +39,22 @@ namespace GraphLibrary {
 		/// </summary>
 		public List<Peak<T>> AvailablePeaks { get; set; }
 
+		/// <summary>
+		/// Длина кратчайшего пути
+		/// </summary>
+		[DefaultValue(double.MaxValue - 1)]
+		public double Dist {
+			get;
+			set;
+		}
+		/// <summary>
+		/// Предок
+		/// </summary>
+		[DefaultValue(null)]
+		public Peak<T> Pred {
+			get; set;
+		}
+
 		#region Конструктор
 		/// <summary>
 		/// Конструктор
@@ -159,6 +175,9 @@ namespace GraphLibrary {
 		/// <returns></returns>
 		public static bool operator == (Peak<T> peak1, Peak<T> peak2) {
 			if(peak1 + "" == "" || peak2 + "" == "") {
+				if (peak1 + "" == "" && peak2 + "" == "") {
+					return true;
+				}
 				return false;
 			}
 			return EqualityComparer<T>.Default.Equals(peak1.Value, peak2.Value);
