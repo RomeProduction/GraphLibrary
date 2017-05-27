@@ -129,6 +129,11 @@ namespace GraphLibrary {
 						ignore.Add(r);
 					}
 				}
+
+				if (minRib == null) {
+					break;
+				}
+
 				if (!component.ContainsPeak(minRib.Peak1) &&
 					!component.ContainsPeak(minRib.Peak2)) {
 					//Если компонента не содержит ни одну из вершин, то пытаемся найти компоненту которая их содержит
@@ -180,7 +185,7 @@ namespace GraphLibrary {
 
 			}
 
-			return component.Ribs;
+			return components.FirstOrDefault(x => x.Ribs.Count == components.Max(c => c.Ribs.Count)).Ribs;
 		}
 
 		/// <summary>
@@ -200,7 +205,9 @@ namespace GraphLibrary {
 
 			});
 
-			while (components.Count > 1) {
+			var ribCount = 0;
+
+			while (components.Count > 1 && ribCount <= graf.RibsCount) {
 				for (int i = 0; i < components.Count; i++) {
 					var c = components[i];
 					for (int j = 0; j < c.Peaks.Count; j++) {
@@ -241,11 +248,16 @@ namespace GraphLibrary {
 
 				}
 
+				ribCount = 0;
+				foreach (var com in components) {
+					ribCount += com.Ribs.Count;
+				}
+				ribCount += ignore.Count;
 
 			}
 
 
-			return components[0].Ribs;
+			return components.FirstOrDefault(x => x.Ribs.Count == components.Max(c => c.Ribs.Count)).Ribs;
 
 		}
 
